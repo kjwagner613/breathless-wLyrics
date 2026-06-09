@@ -23,6 +23,9 @@ body {
     padding: 10px 14px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 24px;
     font-weight: 600;
+    background-color: pink;
+    color: black;
+    border: 2px solid red;
 }
