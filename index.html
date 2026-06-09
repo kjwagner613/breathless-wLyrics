@@ -7,10 +7,31 @@
     <title>Breathless with Lyrics</title>
 </head>
 <body>
-    <video width="640" height="480" controls>
-  <source src="assets/breathless.mp4" type="video/mp4">
+  <div class="player-wrap">
+    <video id="songVideo" width="640" height="480" controls playsinline webkit-playsinline preload="metadata">
+      <source src="assets/breathless.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <button id="startAudioBtn" type="button">Tap to Play with Sound</button>
+  </div>
 
-  Your browser does not support the video tag.
-</video>   
+  <script>
+    const video = document.getElementById('songVideo');
+    const startButton = document.getElementById('startAudioBtn');
+
+    async function startWithSound() {
+      video.muted = false;
+      video.volume = 1;
+
+      try {
+        await video.play();
+        startButton.style.display = 'none';
+      } catch (error) {
+        startButton.textContent = 'Tap again to allow audio';
+      }
+    }
+
+    startButton.addEventListener('click', startWithSound);
+  </script>
 </body>
 </html>
