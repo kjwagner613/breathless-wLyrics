@@ -18,13 +18,22 @@ body {
     gap: 12px;
 }
 
-#songVideo {
+.video-crop {
+    --visible-height: 425;
     height: 75vh;
-    width: auto;
+    aspect-ratio: 640 / var(--visible-height);
+}
+
+#songVideo {
+    display: block;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: top center;
 }
 
     @media (max-width: 900px) {
-        #songVideo {
+        .video-crop {
             height: auto;
             width: 60vw;
         }
