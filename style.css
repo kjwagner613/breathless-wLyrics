@@ -1,5 +1,5 @@
 body {
-    background-color: grey;
+    background-color: rgb(13, 4, 44);
     align-items: center;
     justify-content: center;
     display: flex;
@@ -14,9 +14,16 @@ body {
 }
 
 #songVideo {
-    max-width: 92vw;
-    height: auto;
+    height: 75vh;
+    width: auto;
 }
+
+    @media (max-width: 900px) {
+        #songVideo {
+            height: auto;
+            width: 60vw;
+        }
+    }
 
 #startAudioBtn {
     border: 0;
