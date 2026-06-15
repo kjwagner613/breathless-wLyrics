@@ -19,7 +19,7 @@ body {
 }
 
 .video-crop {
-    --visible-height: 425;
+    --visible-height: 425cd ;
     height: 75vh;
     aspect-ratio: 640 / var(--visible-height);
 }
