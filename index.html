@@ -8,32 +8,147 @@
 </head>
 <body>
   <div class="player-wrap">
-    <div class="video-crop">
-      <video id="songVideo" width="640" height="480" controls playsinline webkit-playsinline preload="metadata">
+    <div class="video-shell">
+      <div class="video-crop">
+      <video id="songVideo" width="640" height="480" playsinline webkit-playsinline preload="metadata">
         <source src="assets/breathless_ios.mp4" type="video/mp4">
       Your browser does not support the video tag.
-    </video>
+      </video>
+      </div>
+      <label class="volume-bar" for="volumeControl" aria-label="Volume control">
+        <span class="volume-bar__label">Volume</span>
+        <span class="volume-bar__track">
+          <input id="volumeControl" type="range" min="0" max="1" step="0.01" value="1" orient="vertical">
+        </span>
+      </label>
     </div>
+    <div class="transport" aria-label="Video controls">
+      <button id="playPauseBtn" class="transport__button transport__button--primary" type="button" aria-pressed="false">Pause</button>
+      <div id="timeDisplay" class="transport__time" aria-live="polite">0:00 / 0:00</div>
+      <button id="muteBtn" class="transport__button" type="button" aria-pressed="false">Mute</button>
+    </div>
+    <!-- </div>
     <button id="startAudioBtn" type="button">Tap to Play with Sound</button>
-  </div>
-
+  </div> -->
+<!-- <h2>Tap the video or use the controls to begin playback.</h2> -->
   <script>
     const video = document.getElementById('songVideo');
     const startButton = document.getElementById('startAudioBtn');
+    const volumeControl = document.getElementById('volumeControl');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const muteBtn = document.getElementById('muteBtn');
+    const timeDisplay = document.getElementById('timeDisplay');
+
+    video.volume = Number(volumeControl.value);
+
+    function formatTime(timeInSeconds) {
+      if (!Number.isFinite(timeInSeconds)) {
+        return '0:00';
+      }
+
+      const minutes = Math.floor(timeInSeconds / 60);
+      const seconds = Math.floor(timeInSeconds % 60);
+      return `${minutes}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function syncTimeDisplay() {
+      timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+    }
+
+    function syncPlayState() {
+      const isPaused = video.paused;
+      playPauseBtn.textContent = isPaused ? 'Play' : 'Pause';
+      playPauseBtn.setAttribute('aria-pressed', String(!isPaused));
+    }
+
+    function syncMuteState() {
+      const isMuted = video.muted || video.volume === 0;
+      muteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
+      muteBtn.setAttribute('aria-pressed', String(isMuted));
+    }
+
+    async function togglePlayback() {
+      if (video.paused) {
+        await video.play();
+      } else {
+        video.pause();
+      }
+      syncPlayState();
+    }
+
+    volumeControl.addEventListener('input', (event) => {
+      video.volume = Number(event.target.value);
+      video.muted = video.volume === 0;
+      syncMuteState();
+    });
+
+    playPauseBtn.addEventListener('click', async () => {
+      try {
+        await togglePlayback();
+      } catch (error) {
+        syncPlayState();
+      }
+    });
+
+    muteBtn.addEventListener('click', () => {
+      if (video.muted || video.volume === 0) {
+        video.muted = false;
+        if (video.volume === 0) {
+          video.volume = 1;
+          volumeControl.value = '1';
+        }
+      } else {
+        video.muted = true;
+      }
+
+      syncMuteState();
+    });
+
+    video.addEventListener('click', async () => {
+      try {
+        await togglePlayback();
+      } catch (error) {
+        syncPlayState();
+      }
+    });
+
+    video.addEventListener('play', syncPlayState);
+    video.addEventListener('pause', syncPlayState);
+    video.addEventListener('timeupdate', syncTimeDisplay);
+    video.addEventListener('loadedmetadata', syncTimeDisplay);
+    video.addEventListener('volumechange', () => {
+      if (!video.muted && video.volume > 0) {
+        volumeControl.value = String(video.volume);
+      }
+      syncMuteState();
+    });
 
     async function startWithSound() {
       video.muted = false;
       video.volume = 1;
+      if (volumeControl) {
+        volumeControl.value = '1';
+      }
 
       try {
         await video.play();
-        startButton.style.display = 'none';
+        if (startButton) {
+          startButton.style.display = 'none';
+        }
       } catch (error) {
-        startButton.textContent = 'Tap again to allow audio';
+        if (startButton) {
+          startButton.textContent = 'Tap again to allow audio';
+        }
       }
     }
 
-    startButton.addEventListener('click', startWithSound);
+    if (startButton) {
+      startButton.addEventListener('click', startWithSound);
+    }
+
+    syncPlayState();
+    syncMuteState();
+    syncTimeDisplay();
   </script>
 </body>
 </html>
